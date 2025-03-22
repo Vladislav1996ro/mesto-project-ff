@@ -31,34 +31,12 @@ function checkInputValidity(formElement, inputElement, config) {
   }
 }
 
-const disableSubmitButton = (buttonElement, config) => {
-  buttonElement.disabled = true;
-  buttonElement.classList.add(config.inactiveButtonClass);
-};
-
-const enableSubmitButton = (buttonElement, config) => {
-  buttonElement.disabled = false;
-  buttonElement.classList.remove(config.inactiveButtonClass);
-};
-
-function hasInvalidInput(inputList) {
-  return inputList.some((inputElement) => !inputElement.validity.valid);
-}
-
-function toggleButtonState(inputList, buttonElement, config) {
-  if (hasInvalidInput(inputList)) {
-    disableSubmitButton(buttonElement, config);
-  } else {
-    enableSubmitButton(buttonElement, config);
-  }
-}
-
 function setEventListeners(formElement, config) {
   const inputList = Array.from(
     formElement.querySelectorAll(config.inputSelector)
   );
   const buttonElement = formElement.querySelector(config.submitButtonSelector);
-
+  toggleButtonState(inputList, buttonElement, config);
   inputList.forEach((inputElement) => {
     inputElement.addEventListener("input", function () {
       checkInputValidity(formElement, inputElement, config);
@@ -74,6 +52,22 @@ function enableValidation(config) {
   });
 }
 
+function hasInvalidInput(inputList) {
+  return inputList.some((inputElement) => {
+    return !inputElement.validity.valid;
+  });
+}
+
+function toggleButtonState(inputList, buttonElement, config) {
+  if (hasInvalidInput(inputList)) {
+    buttonElement.disabled = true;
+    buttonElement.classList.add(config.inactiveButtonClass);
+  } else {
+    buttonElement.disabled = false;
+    buttonElement.classList.remove(config.inactiveButtonClass);
+  }
+}
+
 function clearValidation(formElement, config) {
   const inputList = Array.from(
     formElement.querySelectorAll(config.inputSelector)
@@ -84,7 +78,7 @@ function clearValidation(formElement, config) {
     hideInputError(formElement, inputElement, config);
   });
 
-  disableSubmitButton(buttonElement, config);
+  toggleButtonState(inputList, buttonElement, config);
 }
 
 export { enableValidation, clearValidation };
